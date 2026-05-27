@@ -32,7 +32,10 @@ app.post('/api/ordenes', async (req, res) => {
       });
     }
 
-    // 3. Calcular total y guardar la orden
+    // 3. Descontar el stock en el Catálogo
+    await axios.patch(`${CATALOG_URL}/api/libros/${libroId}/stock`, { cantidad });
+
+    // 4. Calcular total y guardar la orden
     const totalAPagar = parseFloat((libro.precio * cantidad).toFixed(2));
 
     const nuevaOrden = {
@@ -43,6 +46,7 @@ app.post('/api/ordenes', async (req, res) => {
       cantidad,
       precioUnitario: libro.precio,
       totalAPagar,
+      stockRestante: libro.stock - cantidad,
       fecha: new Date().toISOString(),
     };
 
